@@ -1,3 +1,62 @@
+#Link to document: https://docs.google.com/document/d/1-cBHDWnf473ALee5he5QzqsbR8CHlelJDUeVduvnVOE/edit#
+
+# To Do
+# -library(readr)
+# -clustering hierarchical k-means with Hartigan's Rule
+# -caret
+# -decision tree
+# -SVM (lib kernlab)
+# -neural network
+# - logistic regression (plus lasso, plus bootstrapping)
+# - shapley shapr: Explaining individual machine learning predictions with Shapley values
+# better to use shapper 
+# in the end use ensemble https://github.com/RichardOnData/YouTube-Scripts/blob/master/R%20Tutorial%20(ML)%20-%20caret.Rmd
+# kfold with stratified, use oversampling? 
+# 
+# 
+#split = sample.split(df$deceased, SplitRatio = 0.70)
+#df_train = subset(df, split == TRUE)
+#df_test = subset(df, split == FALSE)
+
+#df_train <- 
+
+#data normalization
+#https://datascience.stackexchange.com/questions/13971/standardization-normalization-test-data-in-r
+
+# misClasificError <- mean(dummy_predictions != df_train$deceased)
+# print(paste('Accuracy',1-misClasificError))
+
+
+# misClasificError <- mean(fitted.results != df_test$deceased)
+# print(paste('Accuracy',1-misClasificError))
+
+
+##FRIEDHOF
+
+# # check for multicollinearity and verify if dummy encoding has worked
+# #One-hot encoding converts it into n variables, while dummy encoding converts it into n-1 variables
+# df_num <- df_train %>% select(where(is.numeric))
+# 
+# #
+# df_num %>%
+#   cor(use="pairwise.complete.obs", method="spearman") %>%
+#   ggcorrplot(show.diag = F, type="full", lab=TRUE, lab_size=2, outline.color = "white",
+#              ggtheme = ggplot2::theme_gray,
+#              colors = c("#6D9EC1", "white", "#E46726"))
+# 
+# 
+# 
+# #vif werte
+# 
+# library("car")
+# 
+# vif(lr_model)
+
+
+
+
+
+
 # MSc Data Science
 # Module: R for Data Science (DSM110)
 # 
@@ -6,7 +65,7 @@
 # 
 # Student Number: 200199830
 # Created: 15 July 2022
-# Last modified: 12 September 2022
+# Last modified: 02 September 2022
 
 
 # ******************************************************************************
@@ -816,32 +875,57 @@ print(ensemble_metric_df)
 
 #adding model as new column to each dataframe that stores performance of 
 #individual models
-glm_summary <- add_column(glm_summary, model = rep(c("log regression"),dim(glm_summary)[1]), .before = "Predictor variables")
-lasso_summary <- add_column(lasso_summary, model = rep(c("Lasso regression"),dim(lasso_summary)[1]), .before = "Predictor variables")
-knn_summary <- add_column(knn_summary, model = rep(c("KNN"),dim(knn_summary)[1]), .before = "Predictor variables")
-gbm_summary <- add_column(gbm_summary, model = rep(c("GBM"),dim(gbm_summary)[1]), .before = "Predictor variables")
-svm_summary <- add_column(svm_summary, model = rep(c("GBM"),dim(svm_summary)[1]), .before = "Predictor variables")
-rf_summary <- add_column(rf_summary, model = rep(c("RF"),dim(rf_summary)[1]), .before = "Predictor variables")
-nn_summary <- add_column(nn_summary, model = rep(c("N Net"),dim(nn_summary)[1]), .before = "Predictor variables")
-ensemble_metric_df <- add_column(ensemble_metric_df, model = rep(c("Ensemble models"),dim(ensemble_metric_df)[1]), .before = "Predictor variables")
+glm_summary <- add_column(glm_summary, model = rep(c("log regression"),dim(glm_summary)[1]), 
+                          .before = "Predictor variables")
+
+lasso_summary <- add_column(lasso_summary, model = rep(c("Lasso regression"),dim(lasso_summary)[1]), 
+                          .before = "Predictor variables")
+
+knn_summary <- add_column(knn_summary, model = rep(c("KNN"),dim(knn_summary)[1]), 
+                            .before = "Predictor variables")
+
+gbm_summary <- add_column(gbm_summary, model = rep(c("GBM"),dim(gbm_summary)[1]), 
+                          .before = "Predictor variables")
+
+svm_summary <- add_column(svm_summary, model = rep(c("GBM"),dim(svm_summary)[1]), 
+                          .before = "Predictor variables")
+
+rf_summary <- add_column(rf_summary, model = rep(c("RF"),dim(rf_summary)[1]), 
+                          .before = "Predictor variables")
+
+nn_summary <- add_column(nn_summary, model = rep(c("N Net"),dim(nn_summary)[1]), 
+                         .before = "Predictor variables")
+
+ensemble_metric_df <- add_column(ensemble_metric_df, model = rep(c("Ensemble models"),dim(ensemble_metric_df)[1]), 
+                         .before = "Predictor variables")
 
 #combining all different summary metrics into a single dataframe
-total_model_summary <- rbind( glm_summary, lasso_summary, knn_summary, svm_summary, gbm_summary, rf_summary, nn_summary, ensemble_metric_df)
+total_model_summary <- rbind(
+glm_summary,
+lasso_summary,
+knn_summary,
+svm_summary,
+gbm_summary,
+rf_summary,
+nn_summary,
+ensemble_metric_df)
 
 #only select relevant columns
 total_model_summary <- total_model_summary %>% select(model, "Predictor variables", "F1 score")
 
-#standardize column names for plotting function (ggplot expects standardized names)
+#standardize column names for plotting function
 names(total_model_summary) <- make.names(names(total_model_summary))
 
 #plot comparison of different model performance as barplot
-ggplot(total_model_summary %>% select(model, Predictor.variables, F1.score)) +
+ggplot(total_model_summary) +
  aes(x = model, weight = F1.score) +
- geom_bar(fill = "#112446") +          #bar plot with dark blue color
+ geom_bar(fill = "#112446") +
  facet_wrap(vars(Predictor.variables)) +
  labs(title = "Comparison of model performance",x="Classifier", 
       y = "f1-score", caption = "Missing bars if metric is not available.") +
-theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) #rotate tick labels
+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
 
 
 # ******************************************************************************
@@ -850,5 +934,3 @@ theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) #rotate tick
 
 #clearing environment
 rm(list=ls())
-
-
